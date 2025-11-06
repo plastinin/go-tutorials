@@ -7,7 +7,7 @@ import (
 
 func mine(n int) int {
 	fmt.Println("Поход в шахту номер", n, "начался...")
-	time.Sleep(1 * time.Second)
+	time.Sleep(10 * time.Second)
 	fmt.Println("Поход в шахту номер", n, "закончился")
 	return 10
 }
