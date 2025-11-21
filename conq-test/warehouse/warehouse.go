@@ -59,15 +59,16 @@ func WarehouseManager(supply <-chan int, demand <-chan common.Operation) {
 }
 
 func processPending(pending []common.Operation, wh *Warehouse) []common.Operation {
-	remaining := []common.Operation{}
+	n := 0
 	for _, op := range pending {
 		if err := wh.Demand(op.Amount); err != nil {
-			remaining = append(remaining, op)
+			pending[n] = op
+			n++
 		} else {
 			fmt.Printf("✅ Отложенный заказ выполнен: -%d, Остаток: %d\n",
 				op.Amount, wh.balance)
 			op.Responce <- true
 		}
 	}
-	return remaining
+	return pending[:n]
 }
