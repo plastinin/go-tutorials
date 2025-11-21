@@ -20,8 +20,8 @@ func main() {
 		partnerClose()
 	}()
 
-	supplyChan := partner.PartnerPool(rand.IntN(10_000)+1, partnerContext)
-	demandChan := customer.CustomerPool(rand.IntN(10_000)+1, partnerContext)
+	supplyChan := partner.PartnerPool(rand.IntN(10)+1, partnerContext)
+	demandChan := customer.CustomerPool(rand.IntN(50)+1, partnerContext)
 
 	warehouse.WarehouseManager(supplyChan, demandChan)
 }
