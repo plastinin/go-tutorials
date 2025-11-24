@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
+	"time"
 )
 
 type Payment struct {
@@ -12,6 +13,12 @@ type Payment struct {
 	USD         int    `json:"USD"`         // сумма покупк
 	FullName    string `json:"fullName"`    // ФИО
 	Address     string `json:"address"`     // Адрес
+	Time        time.Time
+}
+
+type HttpResponse struct {
+	Money          int
+	PaymentHistory []Payment
 }
 
 func (p Payment) Println() {
@@ -33,6 +40,7 @@ func payHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	payment.Time = time.Now()
 
 	mtx.Lock()
 	payment.Println()
@@ -42,8 +50,22 @@ func payHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	paymentHistory = append(paymentHistory, payment)
 
-	fmt.Println("money:", money)
-	fmt.Println("history:", paymentHistory)
+	HttpResponse := HttpResponse{
+		Money:          money,
+		PaymentHistory: paymentHistory,
+	}
+
+	b, err := json.MarshalIndent(HttpResponse, "", "	")
+	if err != nil {
+		fmt.Println("Error", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if _, err := w.Write(b); err != nil {
+		fmt.Println("err:", err)
+		return
+	}
 	mtx.Unlock()
 
 }
